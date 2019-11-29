@@ -27,15 +27,13 @@ public:
 
 	void on_container_start(proton::container& c) override {
 		sender = c.open_sender(url);
-		// Create a receiver requesting a dynamically created queue
-		// for the message source.
+		// Create a receiver requesting a dynamically created queue for the message source
 		receiver_options opts = receiver_options().source(source_options().dynamic(true));
 		receiver = sender.connection().open_receiver("", opts);
 	}
 
 	void send_request() {
 		proton::message req;
-		std::cout << requests.front() << " => " << std::endl;
 		req.body(requests.front());
 		req.reply_to(receiver.source().address());
 		sender.send(req);

@@ -32,23 +32,39 @@
 #include <proton/source_options.hpp>
 #include <proton/tracker.hpp>
 
+#include <thread>         
+#include <chrono>        
+
+#include <iostream>
+#include <ctime>
+#include <string>
+#include <stdio.h>
+
+
+
 int main(int argc, char** argv) {
 	std::string url("127.0.0.1:5672/examples");
 	example::options opts(argc, argv);
+
 	opts.add_value(url, 'a', "address", "connect and send to URL", "URL");
 
 	try {
-		opts.parse();
+		while (true) {
+			opts.parse();
 
-		std::vector<std::string> requests;
-		requests.push_back("Twas brillig, and the slithy toves");
-		requests.push_back("Did gire and gymble in the wabe.");
-		requests.push_back("All mimsy were the borogroves,");
-		requests.push_back("And the mome raths outgrabe.");
+			std::vector<std::string> requests;
+		
+			for (int i = 1; i < 7395; i++) {
+				requests.push_back("Message: "+std::to_string(i));
+			}
+			
+			request req(url, requests);
 
-		request c(url, requests);
+			proton::container(req).run();
 
-		proton::container(c).run();
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+
 		return 0;
 	}
 	catch (const example::bad_option & e) {
