@@ -43,7 +43,7 @@
 
 
 int main(int argc, char** argv) {
-	std::string url("127.0.0.1:5672/examples");
+	std::string url("localhost:5672/queueAnyCast");
 	example::options opts(argc, argv);
 
 	opts.add_value(url, 'a', "address", "connect and send to URL", "URL");

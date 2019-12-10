@@ -5,6 +5,7 @@
 #include <proton/messaging_handler.hpp>
 #include <proton/receiver_options.hpp>
 #include <proton/source_options.hpp>
+#include <proton/source_options.hpp>
 #include <proton/tracker.hpp>
 
 #include <iostream>
@@ -12,10 +13,10 @@
 
 using proton::receiver_options;
 using proton::source_options;
+using proton::sender_options;
 
 #pragma once
-class request : public proton::messaging_handler
-{
+class request : public proton::messaging_handler {
 private:
 	std::string url;
 	std::vector<std::string> requests;
@@ -27,6 +28,7 @@ public:
 
 	void on_container_start(proton::container& c) override {
 		sender = c.open_sender(url);
+
 		// Create a receiver requesting a dynamically created queue for the message source
 		receiver_options opts = receiver_options().source(source_options().dynamic(true));
 		receiver = sender.connection().open_receiver("", opts);
@@ -36,6 +38,9 @@ public:
 		proton::message req;
 		req.body(requests.front());
 		req.reply_to(receiver.source().address());
+
+		std::cout << req.body() << std::endl;
+
 		sender.send(req);
 	}
 
