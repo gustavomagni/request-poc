@@ -40,25 +40,28 @@
 #include <string>
 #include <stdio.h>
 
-
-
 int main(int argc, char** argv) {
-	std::string url("localhost:5672/queueAnyCast");
-	example::options opts(argc, argv);
+	std::string url("10.33.0.26:61616");
+	std::string user("amq-broker");
+	std::string password("redhat");
+	//example::options opts(argc, argv);
 
-	opts.add_value(url, 'a', "address", "connect and send to URL", "URL");
+	int totalMessages = 7395;
+
+	//opts.add_value(url, 'a', "address", "connect and send to URL", "URL");
 
 	try {
+
 		while (true) {
-			opts.parse();
+			//opts.parse();
 
 			std::vector<std::string> requests;
 		
-			for (int i = 1; i < 7395; i++) {
+			for (int i = 1; i < totalMessages; i++) {
 				requests.push_back("Message: "+std::to_string(i));
 			}
 			
-			request req(url, requests);
+			request req(url, user, password, requests);
 
 			proton::container(req).run();
 
@@ -68,7 +71,7 @@ int main(int argc, char** argv) {
 		return 0;
 	}
 	catch (const example::bad_option & e) {
-		std::cout << opts << std::endl << e.what() << std::endl;
+		std::cout << std::endl << e.what() << std::endl;
 	}
 	catch (const std::exception & e) {
 		std::cerr << e.what() << std::endl;
