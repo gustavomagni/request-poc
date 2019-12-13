@@ -25,7 +25,9 @@ private:
 	std::string url;
 	std::string user;
 	std::string password;
+
 	std::vector<std::string> requests;
+
 	proton::sender sender;
 	proton::receiver receiver;
 	proton::connection conn_;
@@ -62,7 +64,7 @@ public:
 		req.body(requests.front());
 		req.reply_to(receiver.source().address());
 
-		std::cout << req.body() << std::endl;
+		//std::cout << req.body() << std::endl;
 
 		sender.send(req);
 	}
