@@ -28,6 +28,7 @@ private:
 	std::vector<std::string> requests;
 	proton::sender sender;
 	proton::receiver receiver;
+	proton::connection conn_;
 
 public:
 	request(const std::string& url, const std::string& user, const std::string& password, const std::vector<std::string>& r) : url(url), user(user), password(password), requests(r) {}
@@ -37,20 +38,17 @@ public:
 
 		if (!user.empty()) co.user(user);
 		if (!password.empty()) co.password(password);
+
+		co.sasl_enabled(true);
+		co.sasl_allow_insecure_mechs(true);
 		
 		source_options sourceOpts;
-		sourceOpts.address("valorEconomicoFila");
-		sourceOpts.dynamic(false);
-
-		//target_options targetOpts;
-		//targetOpts.address("queueAnyCast");
-		//targetOpts.dynamic(false);
+		//sourceOpts.address("valorEconomicoFila");
+		sourceOpts.dynamic(true);
 
 		sender_options opts;
 		opts.delivery_mode(delivery_mode::AT_MOST_ONCE);
-		opts.source(sourceOpts);
-		//opts.name("Queue");
-		//opts.target(targetOpts);
+		//opts.source(sourceOpts);
 
 		sender = c.open_sender(url, opts, co);
 			

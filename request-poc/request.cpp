@@ -41,20 +41,16 @@
 #include <stdio.h>
 
 int main(int argc, char** argv) {
-	std::string url("10.33.0.26:61616");
+	//std::string url("10.33.0.26:61616");
+	std::string url("localhost:61616/valorEconomicoFila");
 	std::string user("amq-broker");
 	std::string password("redhat");
-	//example::options opts(argc, argv);
 
 	int totalMessages = 7395;
-
-	//opts.add_value(url, 'a', "address", "connect and send to URL", "URL");
 
 	try {
 
 		while (true) {
-			//opts.parse();
-
 			std::vector<std::string> requests;
 		
 			for (int i = 1; i < totalMessages; i++) {
@@ -76,6 +72,7 @@ int main(int argc, char** argv) {
 	catch (const std::exception & e) {
 		std::cerr << e.what() << std::endl;
 	}
+
 	return 1;
 }
 
