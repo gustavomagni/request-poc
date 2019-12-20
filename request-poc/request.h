@@ -63,7 +63,7 @@ public:
 		
 		source_options sourceOpts;
 		sourceOpts.address(address);
-		sourceOpts.dynamic(true);
+		//sourceOpts.dynamic(false);
 
 		sender_options opts;
 		opts.delivery_mode(delivery_mode::AT_MOST_ONCE);

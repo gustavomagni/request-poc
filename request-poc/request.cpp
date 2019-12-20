@@ -41,8 +41,8 @@
 #include <time.h> 
 
 int main(int argc, char** argv) {
-	std::string url("localhost:61616/queue.valorEconomico");
-	std::string address("queue.valorEconomico");
+	std::string url("localhost:61616/queue.valorOne");
+	std::string address("queue.valorOne");
 	std::string user("admin");
 	std::string password("admin");
 	int totalMessages = 7395;
