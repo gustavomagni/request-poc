@@ -41,10 +41,10 @@
 #include <time.h> 
 
 int main(int argc, char** argv) {
-	std::string url("localhost:61616/queue.req-res-one");
-	std::string address("queue.req-res-one");
-	std::string user("admin");
-	std::string password("admin");
+	std::string url("localhost:61616/queue.req-res");
+	std::string address("queue.req-res");
+	std::string user("amq-broker");
+	std::string password("redhat");
 	int totalMessages = 7395;
 
 	try {
