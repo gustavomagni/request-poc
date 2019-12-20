@@ -13,13 +13,6 @@
 #include <iostream>
 #include <vector>
 
-#include <iostream>
-#include <ctime>
-#include <string>
-#include <stdio.h>
-#include <time.h> 
-#include <chrono>
-
 using proton::receiver_options;
 using proton::source_options;
 using proton::sender_options;
@@ -40,16 +33,16 @@ private:
 	proton::receiver receiver;
 	proton::connection conn_;
 
-	int desired_ = 7395;
-	int received_ = 0;
+	int confirmed = 0;
+	int total = 7395;
 
 public:
-	request(const std::string& url, const std::string& address, const std::string& user, const std::string& password, int desired) :
+	request(const std::string& url, const std::string& address, const std::string& user, const std::string& password, const std::vector<std::string>& r) :
 		url(url),
 		address(address),
-		user(user),
-		password(password),
-		desired_(desired)
+		user(user), 
+		password(password), 
+		requests(r)
 		{}
 
 	void on_container_start(proton::container& c) override {
@@ -67,6 +60,7 @@ public:
 
 		sender_options opts;
 		opts.delivery_mode(delivery_mode::AT_MOST_ONCE);
+		//opts.source(sourceOpts);
 
 		sender = c.open_sender(url, opts, co);
 			
@@ -76,10 +70,11 @@ public:
 	}
 
 	void send_request() {
-		proton::message req{getMessage()};
+		proton::message req;
+		req.body(requests.front());
 		req.reply_to(receiver.source().address());
 
-		std::cout << "Request" << " => " << req.body() << std::endl;
+		std::cout << req.body() << std::endl;
 
 		sender.send(req);
 	}
@@ -89,34 +84,28 @@ public:
 	}
 
 	void on_message(proton::delivery& d, proton::message& response) override {
-		//if (requests.empty()) return; // Spurious extra message!
+		if (requests.empty()) return; // Spurious extra message!
 
-		std::cout << "Response" << " => " << response.body() << std::endl;
-		received_++;
-		// requests.erase(requests.begin());
+		std::cout << requests.front() << " => " << response.body() << std::endl;
+		requests.erase(requests.begin());
 
-		if (received_ == desired_) {
-			std::cout << "SEND CLOSED...";
-
-			d.connection().close();
-		}
-		else {
+		if (!requests.empty()) {
 			send_request();
 		}
-
+		else {
+			d.connection().close();
+		}
 	}
 
-	std::string getMessage() {
-		auto start = std::chrono::system_clock::now();
-		auto end = std::chrono::system_clock::now();
+	void on_tracker_accept(proton::tracker& t) override {
+		confirmed++;
 
-		std::chrono::duration<double> elapsed_seconds = end - start;
-		std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
-		std::string timeFormat = std::to_string(end_time);
-		timeFormat.insert(10, 235, '0');
-
-		return timeFormat;
+		if (confirmed == total) {
+			std::cout << "all messages confirmed" << std::endl;
+			t.connection().close();
+		}
 	}
+
+
 };
 

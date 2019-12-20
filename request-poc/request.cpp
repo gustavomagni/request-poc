@@ -18,6 +18,7 @@
  * under the License.
  *
  */
+
 #include "request.h"
 #include "fake_cpp11.h"
 #include "options.h"
@@ -41,19 +42,36 @@
 #include <time.h> 
 
 int main(int argc, char** argv) {
-	std::string url("localhost:61616/queue.req-res");
-	std::string address("queue.req-res");
-	std::string user("amq-broker");
-	std::string password("redhat");
+	//std::string url("10.33.0.26:61616");
+	std::string url("localhost:61616/queue.req-resp");
+	std::string address("queue.req-resp");
+	std::string user("admin");
+	std::string password("admin");
+
 	int totalMessages = 7395;
 
 	try {
 
 		while (true) {
-			request req(url, address, user, password, totalMessages);
+			std::vector<std::string> requests;
+
+			for (int i = 0; i < totalMessages; i++) {
+				auto start = std::chrono::system_clock::now();
+				auto end = std::chrono::system_clock::now();
+
+				std::chrono::duration<double> elapsed_seconds = end - start;
+				std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+				std::string timeFormat = std::to_string(end_time);
+				timeFormat.insert(10, 235, '0');
+
+				requests.push_back(timeFormat);
+			}
+
+			request req(url, address, user, password, requests);
 			proton::container(req).run();
 
-			//std::this_thread::sleep_for(std::chrono::seconds(10));
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 
 		return 0;
