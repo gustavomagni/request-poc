@@ -13,6 +13,13 @@
 #include <iostream>
 #include <vector>
 
+#include <iostream>
+#include <ctime>
+#include <string>
+#include <stdio.h>
+#include <time.h> 
+#include <chrono>
+
 using proton::receiver_options;
 using proton::source_options;
 using proton::sender_options;
@@ -25,6 +32,7 @@ private:
 	std::string url;
 	std::string user;
 	std::string password;
+	std::string address;
 
 	std::vector<std::string> requests;
 
@@ -32,8 +40,17 @@ private:
 	proton::receiver receiver;
 	proton::connection conn_;
 
+	int desired_ = 7395;
+	int received_ = 0;
+
 public:
-	request(const std::string& url, const std::string& user, const std::string& password, const std::vector<std::string>& r) : url(url), user(user), password(password), requests(r) {}
+	request(const std::string& url, const std::string& address, const std::string& user, const std::string& password, int desired) :
+		url(url),
+		address(address),
+		user(user),
+		password(password),
+		desired_(desired)
+		{}
 
 	void on_container_start(proton::container& c) override {
 		proton::connection_options co;
@@ -45,12 +62,11 @@ public:
 		co.sasl_allow_insecure_mechs(true);
 		
 		source_options sourceOpts;
-		//sourceOpts.address("valorEconomicoFila");
+		sourceOpts.address(address);
 		sourceOpts.dynamic(true);
 
 		sender_options opts;
 		opts.delivery_mode(delivery_mode::AT_MOST_ONCE);
-		//opts.source(sourceOpts);
 
 		sender = c.open_sender(url, opts, co);
 			
@@ -60,11 +76,10 @@ public:
 	}
 
 	void send_request() {
-		proton::message req;
-		req.body(requests.front());
+		proton::message req{getMessage()};
 		req.reply_to(receiver.source().address());
 
-		//std::cout << req.body() << std::endl;
+		std::cout << "Request" << " => " << req.body() << std::endl;
 
 		sender.send(req);
 	}
@@ -74,17 +89,34 @@ public:
 	}
 
 	void on_message(proton::delivery& d, proton::message& response) override {
-		if (requests.empty()) return; // Spurious extra message!
+		//if (requests.empty()) return; // Spurious extra message!
 
-		std::cout << requests.front() << " => " << response.body() << std::endl;
-		requests.erase(requests.begin());
+		std::cout << "Response" << " => " << response.body() << std::endl;
+		received_++;
+		// requests.erase(requests.begin());
 
-		if (!requests.empty()) {
-			send_request();
-		}
-		else {
+		if (received_ == desired_) {
+			std::cout << "SEND CLOSED...";
+
 			d.connection().close();
 		}
+		else {
+			send_request();
+		}
+
+	}
+
+	std::string getMessage() {
+		auto start = std::chrono::system_clock::now();
+		auto end = std::chrono::system_clock::now();
+
+		std::chrono::duration<double> elapsed_seconds = end - start;
+		std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+		std::string timeFormat = std::to_string(end_time);
+		timeFormat.insert(10, 235, '0');
+
+		return timeFormat;
 	}
 };
 

@@ -18,7 +18,6 @@
  * under the License.
  *
  */
-
 #include "request.h"
 #include "fake_cpp11.h"
 #include "options.h"
@@ -39,29 +38,22 @@
 #include <ctime>
 #include <string>
 #include <stdio.h>
+#include <time.h> 
 
 int main(int argc, char** argv) {
-	//std::string url("10.33.0.26:61616");
-	std::string url("localhost:61616/valorEconomicoFila");
-	std::string user("amq-broker");
-	std::string password("redhat");
-
+	std::string url("localhost:61616/queue.valorEconomico");
+	std::string address("queue.valorEconomico");
+	std::string user("admin");
+	std::string password("admin");
 	int totalMessages = 7395;
 
 	try {
 
 		while (true) {
-			std::vector<std::string> requests;
-		
-			for (int i = 1; i < totalMessages; i++) {
-				requests.push_back("Message: "+std::to_string(i));
-			}
-			
-			request req(url, user, password, requests);
-
+			request req(url, address, user, password, totalMessages);
 			proton::container(req).run();
 
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			//std::this_thread::sleep_for(std::chrono::seconds(10));
 		}
 
 		return 0;
