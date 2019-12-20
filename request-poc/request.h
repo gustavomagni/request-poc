@@ -62,8 +62,8 @@ public:
 		co.sasl_allow_insecure_mechs(true);
 		
 		source_options sourceOpts;
-		sourceOpts.address(address);
-		//sourceOpts.dynamic(false);
+		//sourceOpts.address(address);
+		sourceOpts.dynamic(true);
 
 		sender_options opts;
 		opts.delivery_mode(delivery_mode::AT_MOST_ONCE);

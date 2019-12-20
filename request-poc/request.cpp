@@ -41,8 +41,8 @@
 #include <time.h> 
 
 int main(int argc, char** argv) {
-	std::string url("localhost:61616/queue.valorOne");
-	std::string address("queue.valorOne");
+	std::string url("localhost:61616/queue.req-res-one");
+	std::string address("queue.req-res-one");
 	std::string user("admin");
 	std::string password("admin");
 	int totalMessages = 7395;
